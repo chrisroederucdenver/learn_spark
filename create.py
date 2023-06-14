@@ -33,19 +33,25 @@ people_df.show();
 
 # aggregate with group-by
 print("\ngroup by sex")
-age_df = spark.sql("SELECT sex, avg(age) from people group by sex") 
+sql = "SELECT sex, avg(age) from people group by sex"
+print(sql)
+age_df = spark.sql(sql)
 print(age_df.count())
 age_df.show();
 
 # aggregate with group-by, but don't select that var.
 print("\ngroup by sex")
-age_df = spark.sql("SELECT avg(age) from people group by sex") 
+sql = "SELECT avg(age) from people group by sex"
+print(sql)
+age_df = spark.sql(sql)
 print(age_df.count())
 age_df.show()
 
 # basic parition windowing with rank()
 print("\npartition by name, rank")
-rank_df = spark.sql("SELECT id, name, rank() over(partition by name order by id) as idx from people")
+sql = "SELECT id, name, rank() over(partition by name order by id) as idx from people"
+print(sql)
+rank_df = spark.sql(sql)
 print(rank_df.count())
 rank_df.show()
 
@@ -57,12 +63,16 @@ rank_df.show()
 #rank_df.show()
 
 print("\npartition by name, sex, collect_set")
-rank_df = spark.sql("SELECT id, name, sex, age, collect_set(id) over(partition by name, sex order by id) as idx from people")
+sql = "SELECT id, name, sex, age, collect_set(id) over(partition by name, sex order by id) as idx from people"
+print(sql)
+rank_df = spark.sql(sql)
 print(rank_df.count())
 rank_df.show()
 
 print("\ngroup by name, sex")
-rank_df = spark.sql("SELECT name, sex, avg(age), collect_set(id) from people group by name, sex ")
+sql = "SELECT name, sex, avg(age), collect_set(id) from people group by name, sex "
+print(sql)
+rank_df = spark.sql(sql)
 print(rank_df.count())
 rank_df.show()
 
