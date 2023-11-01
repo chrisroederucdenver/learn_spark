@@ -32,3 +32,4 @@ Actually, with a lack of good keys in a dataset like people, and a denormalized 
 
 # TODO
 - I have figured out how to drop a table from within spark, so the run.sh script removes the file from the file system.
+- Explore how to see the impacts of nulls and open-joins on non-key attributes mistakenly included in the key
