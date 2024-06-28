@@ -6,7 +6,7 @@ id,name,age,sex,race,numbers
 4,Dave,32,M,White, 
 11,Anne,31,F,White
 12,Barb,53,F,Black,"[22,33,44]"
-13,Christine,27,F,Asian,"[22, 33, 44 ]"
+13,Christine,27,F,Asian,"[29, 33, 44 ]"
 14,Dana,32,F,White,"[22,33,44 ]"
 21,Al,31,M,White,"[22,33,44]"
 23,Al,33,F,Asian, "[22,33,44 ]"
