@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
 
-#### rm -rf  spark-warehouse/learn_spark_db.db/people_array
+# This script sets up a Spark Session, creates and loads a table with data,
+# queries it back out into a dataframe, and digs into an array in one of its columns.
+# It reads  people_array.csv which has a column of strings that look like JSON arrays.
+#   a, b, "[1,2,3]"
+# I think this would be adaptable to quoted a CSV sublist:
+#   a, b, "1,2,3"
+#
+# The motivation for this is multi-valued attributes in claims data. One solution in
+# past has been to create as many copies of the row as such an attribute has value.
+# You have to do this once for each column, and it can cloud the identity of each row
+# because for whatever an entity was in the original, now you have many rows for those.
+# Now each row is some kind of sub-entity, and sends you down the road of needing to
+# know what the natural keys are.
+
+# Run with rm -rf spark-warehouse/learn_spark_db.db/people_array ; ./create_with_array.py   
 
 # Notes about CSV here:
 # - no space after comma before a string
@@ -8,9 +22,11 @@
 # - comma with no  entry becomes the empty string
 # - no comma delimiting the string (e.g. when it's the last one) is null
  
+
 from pyspark.sql import SparkSession
 from pyspark.sql.types import ArrayType
 from pyspark.sql.types import StringType
+from pyspark.sql.types import IntegerType
 import pyspark.sql.functions as F
 
 spark = SparkSession.builder \
@@ -42,11 +58,10 @@ people_df.show();
 
 
 # CONVERT a JSON array string to a Spark Array type
-people_df = people_df.withColumn('numbers', F.from_json('numbers', ArrayType(StringType())))
+people_df = people_df.withColumn('numbers', F.from_json('numbers', schema=ArrayType(IntegerType()) ))
 people_df.show();
 
 
-# *** ERROR *** this comes up as an array of string, not
 
 # show more concretely that we do indeed have an array at that spot in the df
 # the process involves types, here still dataframe
@@ -55,42 +70,56 @@ print(type(people_df))
 print(people_df)
 people_df.show()
 
-# still a dataframe
-print("narrow DF ---")
+# still a dataframe, but just the numbers column
+print("\nnarrow DF ---")
 numbers_df=people_df.select('numbers')
 print(type(numbers_df))
 print(numbers_df)
 numbers_df.show()
 
 # Row
-print("ROW ---")
+print("\nROW ---")
 numbers_row = numbers_df.first()
 print(type(numbers_row))
 print(numbers_row)
-###numbers_row.show()
 
-print("LIST ---")
+print("\nLIST by name ---")
 numbers_cell = numbers_row.numbers
 print(type(numbers_cell))
 print(numbers_cell)
 
-print("first number ---")
-numbers_first = numbers_row[0]
+print("\nLIST by number ---")
+numbers_cell = numbers_row[0]
+print(type(numbers_cell))
+print(numbers_cell)
+
+print("\nfirst number ---")
+numbers_first = numbers_cell[0]
 print(type(numbers_first))
 print(numbers_first)
 
-print("first number ---, really")
-numbers_first = numbers_row[0][0]
-print(type(numbers_first))
-print(numbers_first)
-
-
+###################################
 # all together, the list/array
-print(people_df.select('numbers').first().numbers)
+###################################
+print(" short versions to the array  ---- ")
+print("The select returns a dataframe, you still need the single attribute name at the end:", end='')
+print(people_df.select('numbers').first())
+print("Skip the select and just name the single attribute.")
 print(people_df.first().numbers)
 
-print(people_df.select('numbers').first().numbers[0])
-print(people_df.first().numbers[0])
+print("Short versions to particular members of the array  ---- ")
+print(people_df.select('numbers').first().numbers[1])
+print(people_df.first().numbers[1])
+
+
+
+
+numbers_list = people_df.first().numbers
+if 22 in numbers_list:
+    print("yes we can do that REVCNTRCD thing")
+else:
+    print("keep looking")
+
 
 
 
